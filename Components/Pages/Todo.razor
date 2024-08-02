@@ -2,33 +2,87 @@
 @rendermode InteractiveServer
 <PageTitle>To do Page</PageTitle>
 
+@* 
+Creating a To Do list: Title, description, due date and completed box 
+Shown in a table and has CRUD abilities
+-When Completed, updates amount To Do count, and strike throughs row
+-Able to be filtered by title name or due date. 
 
-<h3>Todo (@todos.Count(t => !t.IsDone))</h3>
+*@
+
+<h3>To Do List(@todoList.Count(t => !t.IsDone))</h3>
 
 <ul>
-    @foreach (var todo in todos){
+    @foreach (var todo in todoList){
         <li>
             @todo.Title
             <input type="checkbox" @bind="todo.IsDone">
-            <input @bind="todo.Title">
+            @* <input @bind="todo.Title"> *@
         </li>
     }
 </ul>
 
-<input @bind="newTodo">
-<button @onclick="AddTodo">Add Todo</button>
+<table class="table">
+    <thead>
+        <tr>
+            @* <th type="checkbox" @bing="todo.IsDone"> *@
+            <th style="width: 100px;">Completed</th>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Due Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var todo in todoList){
+        <tr>
+            <input type="checkbox" @bind="todo.IsDone"></input>
+            <td>@todo.Title</td>
+            <td>@todo.Description</td>
+            <td>@todo.DueDate.ToString("dd-MM-yyyy")</td>
+        </tr>
+        }
+    </tbody>
+</table>
+
+@* Create *@
+<div>
+    <p>Add a new to do item:</p>
+    <input @bind="newTodoTitle" title="title">
+    <input @bind="newTodoDescription" title="Description">
+    <button @onclick="AddTodo">Add Todo</button>
+    <input type="date" @bind="newTodoDate"></input>
+</div>
+
 @code {
-    List<TodoItem> todos = new List<TodoItem>();
-    string newTodo = "";
+    List<TodoItem> todoList = new List<TodoItem>();
+    string newTodoTitle = "";
+    string newTodoDescription ="";
+    DateTime newTodoDate = DateTime.Today;
     public class TodoItem{
         public required string Title { get; set; }
-        public bool IsDone { get; set; }
+        public bool IsDone { get; set; } = false;
+        public string Description { get; set; } = "";
+        public DateTime DueDate { get; set; } = DateTime.Today;
     }
     private void AddTodo(MouseEventArgs e)
     {
-        if (!string.IsNullOrWhiteSpace(newTodo)){
-            todos.Add(new TodoItem { Title = newTodo});
-            newTodo = "";
+        if (!string.IsNullOrWhiteSpace(newTodoTitle)){
+            todoList.Add(new TodoItem { 
+                Title = newTodoTitle, 
+                Description = newTodoDescription, 
+                DueDate = newTodoDate,
+            });
+            newTodoTitle = "";
+            newTodoDescription = "";
+            newTodoDate = DateTime.Today;
         }
+    }
+    protected override void OnInitialized(){
+        todoList.Add(new TodoItem
+        {
+            Title = "Buy groceries",
+            Description = "Milk, Bread, Eggs",
+            DueDate = DateTime.Now.AddDays(1)
+        });
     }
 }
