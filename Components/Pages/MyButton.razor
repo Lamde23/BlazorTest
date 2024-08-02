@@ -1,0 +1,16 @@
+﻿<button @onclick="OnClick" @attributes="AdditionalAttributes">@ChildContent</button>
+
+@code {
+    [Parameter]
+    //Handles events, mouse click events in this case
+    public EventCallback<MouseEventArgs> OnClick {get; set; }
+
+    [Parameter]
+    //RenderFragment - represents segment of UI to be rendered
+    public RenderFragment ChildContent {get; set; }
+
+    [Parameter (CaptureUnmatchedValues = true)]
+    //Captures any additional attributes not explicitly defined as parameters
+    //Dictionary allows storing arbitrary attributes, ie allows adding css
+    public Dictionary<string, object> AdditionalAttributes { get; set; }
+}
