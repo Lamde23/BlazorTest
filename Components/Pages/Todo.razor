@@ -10,13 +10,13 @@ Shown in a table and has CRUD abilities
 
 *@
 
-<h3>To Do List(@todoList.Count(t => !t.IsDone))</h3>
+<h3>To Do List(@todoList.Count(t => !t.IsDone) item(s))</h3>
 
 <ul>
     @foreach (var todo in todoList){
         <li>
             @todo.Title
-            <input type="checkbox" @bind="todo.IsDone">
+            <input type="checkbox" @bind="todo.IsDone" >
             @* <input @bind="todo.Title"> *@
         </li>
     }
@@ -29,17 +29,45 @@ Shown in a table and has CRUD abilities
             <th style="width: 50px;"></th>
             <th>Title</th>
             <th>Description</th>
-            <th>Due Date</th>
+            <th style="width: 100px;">Due Date</th>
+            <th style="width: 150px;"></th>
         </tr>
     </thead>
     <tbody>
         @foreach (var todo in todoList){
         <tr>
-            <input type="checkbox" @bind="todo.IsDone"></input>
-            <td>@todo.Title</td>
-            <td>@todo.Description</td>
-            <td>@todo.DueDate.ToString("dd-MM-yyyy")</td>
-            <td><button @onclick="() => DeleteTodo(todo)">Delete</button> </td>
+            <input type="checkbox" @bind="todo.IsDone"/>
+            <td>
+                @if (todo.isEditing) {
+                    <input @bind="todo.Title" title="Hi"/>
+                } else {
+                    @todo.Title
+                }
+            </td>
+            <td>
+                @if (todo.isEditing) {
+                    <input @bind="@todo.Description"/>
+                } else {
+                    @todo.Description
+                }
+            </td>
+            <td>
+                @if (todo.isEditing) {
+                    <input type="date" @bind="@todo.DueDate"/>
+                } else {
+                    @todo.DueDate.ToString("dd-MM-yyyy")
+                }
+            </td>
+            <td>
+                @if (todo.isEditing)
+                {
+                    <button @onclick="()=> EditTodo(todo)">Save</button>
+                    @* <button >Cancel</button> *@
+                } else {
+                    <button @onclick="() => EditTodo(todo)">Edit</button>
+                    <button @onclick="() => DeleteTodo(todo)">Delete</button>
+                }
+            </td>
         </tr>
         }
     </tbody>
@@ -60,7 +88,7 @@ Shown in a table and has CRUD abilities
 @code {
     List<TodoItem> todoList = new List<TodoItem>();
     string newTodoTitle = "";
-    string newTodoDescription ="";
+    string newTodoDescription = "";
     DateTime newTodoDate = DateTime.Today;
     bool isTitleEmpty = false;
     public class TodoItem{
@@ -68,6 +96,7 @@ Shown in a table and has CRUD abilities
         public bool IsDone { get; set; } = false;
         public string Description { get; set; } = "";
         public DateTime DueDate { get; set; } = DateTime.Today;
+        public bool isEditing { get; set; } = false;
     }
     private void AddTodo(MouseEventArgs e)
     {
@@ -89,12 +118,22 @@ Shown in a table and has CRUD abilities
     {
         todoList.Remove(todo);
     }
+    private void EditTodo(TodoItem todo)
+    {
+        todo.isEditing = !todo.isEditing;
+    }
     protected override void OnInitialized(){
         todoList.Add(new TodoItem
         {
             Title = "Buy groceries",
             Description = "Milk, Bread, Eggs",
-            DueDate = DateTime.Now.AddDays(1)
+            DueDate = DateTime.Now.AddDays(1), 
+        });
+        todoList.Add(new TodoItem
+        {
+            Title = "Replace phone screen",
+            Description = "Located PB Tech",
+            DueDate = DateTime.Now.AddDays(1), 
         });
     }
 }
