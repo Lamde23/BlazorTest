@@ -26,7 +26,7 @@ Shown in a table and has CRUD abilities
     <thead>
         <tr>
             @* <th type="checkbox" @bing="todo.IsDone"> *@
-            <th style="width: 100px;">Completed</th>
+            <th style="width: 50px;"></th>
             <th>Title</th>
             <th>Description</th>
             <th>Due Date</th>
@@ -39,25 +39,30 @@ Shown in a table and has CRUD abilities
             <td>@todo.Title</td>
             <td>@todo.Description</td>
             <td>@todo.DueDate.ToString("dd-MM-yyyy")</td>
+            <td><button @onclick="() => DeleteTodo(todo)">Delete</button> </td>
         </tr>
         }
     </tbody>
 </table>
 
-@* Create *@
-<div>
+@* Create To Do*@
+<ul>
     <p>Add a new to do item:</p>
-    <input @bind="newTodoTitle" title="title">
-    <input @bind="newTodoDescription" title="Description">
+    <li>Title: <input @bind="newTodoTitle" title="title"> </li>
+    <li>Description: <input @bind="newTodoDescription" title="Description"> </li>
+    <li>Date due: <input type="date" @bind="newTodoDate"></input> </li>
     <button @onclick="AddTodo">Add Todo</button>
-    <input type="date" @bind="newTodoDate"></input>
-</div>
+    @if (isTitleEmpty){
+        <p class="text-danger">Title is empty</p>
+    }
+</ul>
 
 @code {
     List<TodoItem> todoList = new List<TodoItem>();
     string newTodoTitle = "";
     string newTodoDescription ="";
     DateTime newTodoDate = DateTime.Today;
+    bool isTitleEmpty = false;
     public class TodoItem{
         public required string Title { get; set; }
         public bool IsDone { get; set; } = false;
@@ -75,7 +80,14 @@ Shown in a table and has CRUD abilities
             newTodoTitle = "";
             newTodoDescription = "";
             newTodoDate = DateTime.Today;
+            isTitleEmpty = false;
+        } else {
+            isTitleEmpty = true;
         }
+    }
+    private void DeleteTodo(TodoItem todo)
+    {
+        todoList.Remove(todo);
     }
     protected override void OnInitialized(){
         todoList.Add(new TodoItem
